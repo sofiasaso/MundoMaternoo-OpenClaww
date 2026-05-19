@@ -1,77 +1,519 @@
-/* ============================================================
-   MundoMaterno — Sistema de Inteligencia Competitiva
-   Paleta: Agua marina + Fucsia | Fuente: Inter
-============================================================ */
+/* =========================================================
+   VARIABLES Y RESET
+========================================================= */
 
 :root {
-  /* ── Agua marina ── */
-  --agua:       #0A9396;
-  --agua-dark:  #005F73;
+  --agua: #0A9396;
+  --agua-dark: #005F73;
   --agua-light: #94D2BD;
-  --agua-pale:  #EAF4F4;
+  --agua-pale: #EAF4F4;
 
-  /* ── Fucsia ── */
-  --fucsia:       #C9184A;
-  --fucsia-dark:  #A4133C;
-  --fucsia-pale:  #FFF0F3;
+  --fucsia: #C9184A;
 
-  /* ── Neutros ── */
-  --bg:           #F5FAFA;
-  --surface:      #FFFFFF;
-  --border:       #DEE9E9;
-  --text:         #0D1B1E;
-  --text-muted:   #56787A;
-  --text-light:   #9BB5B6;
+  --bg: #F5FAFA;
+  --surface: #FFFFFF;
+  --border: #DEE9E9;
 
-  /* ── Sombras ── */
+  --text: #0D1B1E;
+  --text-muted: #56787A;
+
   --shadow-sm: 0 1px 4px rgba(10,147,150,.08);
   --shadow-md: 0 4px 14px rgba(10,147,150,.11);
 
-  /* ── Radios ── */
-  --r:    8px;
-  --r-lg: 14px;
+  --r: 10px;
+  --r-lg: 16px;
 
-  /* ── Fuente ── */
-  --font: 'Inter', system-ui, sans-serif;
+  --font: 'Inter', sans-serif;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { font-size: 15px; scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.55;
-  min-height: 100svh;
-  -webkit-font-smoothing: antialiased;
+  font-family: var(--font);
 }
 
-/* override del #root que venía del template de Vite */
 #root {
+  min-height: 100vh;
+}
+
+/* =========================================================
+   LAYOUT
+========================================================= */
+
+.layout {
+  min-height: 100vh;
+}
+
+.main {
+  padding: 2rem;
+  max-width: 1450px;
+  margin: auto;
+}
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.navbar-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--agua);
+}
+
+.navbar-logo {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.navbar-logo span {
+  color: var(--agua);
+}
+
+.navbar-chip {
+  background: var(--agua-pale);
+  color: var(--agua-dark);
+
+  padding: .35rem .65rem;
+  border-radius: 999px;
+  font-size: .8rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-status {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+
+  padding: .75rem 1rem;
+  font-weight: 600;
+
+  transition: .2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-fucsia {
+  background: var(--fucsia);
+  color: white;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid var(--border);
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: .4rem;
+}
+
+.page-sub {
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   KPI CARDS
+========================================================= */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 1rem;
+
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: var(--r-lg);
+
+  padding: 1.3rem;
+  position: relative;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-bar {
+  height: 5px;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.kpi-label {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: .5rem;
+}
+
+.kpi-sub {
+  margin-top: .4rem;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+.kpi-skeleton {
+  height: 35px;
+  width: 100px;
+  margin-top: .7rem;
+
+  border-radius: 8px;
+  background: #ddd;
+
+  animation: pulse 1s infinite;
+}
+
+/* =========================================================
+   CHIPS
+========================================================= */
+
+.comp-row {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+
+  margin-bottom: 1.5rem;
+}
+
+.comp-chip {
+  background: white;
+  border-radius: 999px;
+
+  padding: .8rem 1rem;
+
+  display: flex;
+  gap: .7rem;
+  align-items: center;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.comp-chip-name {
+  font-weight: 700;
+}
+
+.comp-chip-count,
+.comp-chip-price {
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+/* =========================================================
+   GRID INFERIOR
+========================================================= */
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+@media(max-width: 1100px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.panel {
+  background: white;
+  border-radius: var(--r-lg);
+  padding: 1rem;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1rem;
+}
+
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.panel-count {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.search-input {
+  width: 260px;
+
+  padding: .8rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--agua);
+}
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
   width: 100%;
-  max-width: 100%;
-  margin: 0;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--agua-dark);
+  color: white;
+}
+
+th {
+  padding: 1rem;
   text-align: left;
-  border-inline: none;
-  min-height: 100svh;
-  display: block;
+  font-size: .9rem;
 }
 
-/* scrollbar sutil */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--agua-pale); }
-::-webkit-scrollbar-thumb { background: var(--agua-light); border-radius: 4px; }
-
-/* animación de entrada compartida */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
 }
+
+tbody tr:hover {
+  background: #fafafa;
+}
+
+.td-name {
+  max-width: 340px;
+}
+
+.td-price {
+  font-weight: 700;
+}
+
+.td-muted {
+  color: var(--text-muted);
+}
+
+.td-link {
+  color: var(--agua-dark);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge {
+  padding: .35rem .7rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.badge-carymar {
+  background: #E3F6F5;
+  color: #006D77;
+}
+
+.badge-saraisa {
+  background: #FFF1E6;
+  color: #BC6C25;
+}
+
+.badge-ohmama {
+  background: #FFE5EC;
+  color: #C9184A;
+}
+
+/* =========================================================
+   ALERTAS
+========================================================= */
+
+.alerts-body {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+
+.alert-item {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.alert-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: .4rem;
+}
+
+.alert-pct {
+  color: var(--fucsia);
+  font-weight: 700;
+}
+
+.alert-name {
+  font-weight: 600;
+  margin-bottom: .7rem;
+}
+
+.alert-prices {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.alert-old {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.alert-new {
+  color: var(--fucsia);
+  font-weight: 700;
+}
+
+.alert-link {
+  display: inline-block;
+  margin-top: .8rem;
+  color: var(--agua-dark);
+  text-decoration: none;
+  font-size: .9rem;
+}
+
+/* =========================================================
+   STATES
+========================================================= */
+
+.state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.state-icon {
+  margin-right: .5rem;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+
+  color: white;
+  font-weight: 600;
+
+  box-shadow: var(--shadow-md);
+}
+
+.toast-ok {
+  background: var(--agua);
+}
+
+.toast-err {
+  background: var(--fucsia);
+}
+
+/* =========================================================
+   ANIMACIONES
+========================================================= */
+
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-@keyframes blink {
-  0%,100% { opacity: 1; } 50% { opacity:.3; }
+
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
 }
