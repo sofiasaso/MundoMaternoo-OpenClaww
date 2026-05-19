@@ -1,49 +1,77 @@
+/* ============================================================
+   MundoMaterno — Sistema de Inteligencia Competitiva
+   Paleta: Agua marina + Fucsia | Fuente: Inter
+============================================================ */
+
+:root {
+  /* ── Agua marina ── */
+  --agua:       #0A9396;
+  --agua-dark:  #005F73;
+  --agua-light: #94D2BD;
+  --agua-pale:  #EAF4F4;
+
+  /* ── Fucsia ── */
+  --fucsia:       #C9184A;
+  --fucsia-dark:  #A4133C;
+  --fucsia-pale:  #FFF0F3;
+
+  /* ── Neutros ── */
+  --bg:           #F5FAFA;
+  --surface:      #FFFFFF;
+  --border:       #DEE9E9;
+  --text:         #0D1B1E;
+  --text-muted:   #56787A;
+  --text-light:   #9BB5B6;
+
+  /* ── Sombras ── */
+  --shadow-sm: 0 1px 4px rgba(10,147,150,.08);
+  --shadow-md: 0 4px 14px rgba(10,147,150,.11);
+
+  /* ── Radios ── */
+  --r:    8px;
+  --r-lg: 14px;
+
+  /* ── Fuente ── */
+  --font: 'Inter', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; scroll-behavior: smooth; }
+
 body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* override del #root que venía del template de Vite */
+#root {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  text-align: left;
+  border-inline: none;
+  min-height: 100svh;
+  display: block;
 }
 
-.container {
-  padding: 40px;
-}
+/* scrollbar sutil */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--agua-pale); }
+::-webkit-scrollbar-thumb { background: var(--agua-light); border-radius: 4px; }
 
-h1 {
-  margin-bottom: 10px;
+/* animación de entrada compartida */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 30px;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
-
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-  margin-top: 0;
-}
-
-.card a {
-  display: inline-block;
-  margin-top: 10px;
-  text-decoration: none;
-  color: #2563eb;
-}
-
-.filters {
-  margin-top: 20px;
-}
-
-select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  min-width: 200px;
+@keyframes blink {
+  0%,100% { opacity: 1; } 50% { opacity:.3; }
 }
