@@ -389,7 +389,7 @@ export default function App() {
 
             <div className="hero-logo">
               <img
-                src="/images/logo.png"
+                src="/images/Logo.png"
                 alt="Logo Mundo Materno"
                 className="hero-logo-img"
               />
