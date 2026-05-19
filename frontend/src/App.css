@@ -160,9 +160,43 @@ body {
    HEADER
 ========================================================= */
 
-.page-header {
+/*ORIGINALllllllllllllllll*/
+/*.page-header {
+  margin-bottom: 2rem;
+}*/
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 2rem;
   margin-bottom: 2rem;
 }
+
+.page-header {
+  flex: 1;
+}
+
+.hero-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 320px;
+}
+
+.hero-logo-img {
+  width: 100%;
+  max-width: 420px;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,.08));
+
+  animation: fadeUp .5s ease;
+}
+
 
 .page-title {
   font-size: 2.4rem;
@@ -275,11 +309,30 @@ body {
   gap: 1rem;
 }
 
-@media(max-width: 1100px) {
+/*ORIGINALLLLL: @media(max-width: 1100px) {
   .bottom-grid {
     grid-template-columns: 1fr;
   }
+}*/
+
+@media(max-width: 980px) {
+
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-logo {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .hero-logo-img {
+    max-width: 260px;
+  }
+
 }
+
 
 /* =========================================================
    PANEL

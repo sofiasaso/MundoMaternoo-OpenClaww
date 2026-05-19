@@ -369,13 +369,34 @@ export default function App() {
       {/* ── Contenido ── */}
       <main className="main">
 
-        {/* Cabecera */}
-        <div className="page-header">
+
+        {/* Cabecera - ORIGINALLLLLL */}
+        {/*<div className="page-header">
           <h1 className="page-title">Dashboard competitivo</h1>
           <p className="page-sub">
             Monitoreo de precios · Carymar, Saraisa y OhMama
           </p>
-        </div>
+        </div>*/}
+
+          <div className="hero">
+            <div className="page-header">
+              <h1 className="page-title">Dashboard competitivo</h1>
+
+              <p className="page-sub">
+                Monitoreo de precios · Carymar, Saraisa y OhMama
+              </p>
+            </div>
+
+            <div className="hero-logo">
+              <img
+                src="/images/logo.png"
+                alt="Logo Mundo Materno"
+                className="hero-logo-img"
+              />
+            </div>
+
+          </div>
+
 
         {/* KPIs */}
         <div className="kpi-grid">
