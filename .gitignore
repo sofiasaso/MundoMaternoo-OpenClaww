@@ -1,0 +1,75 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg
+*.egg-info/
+dist/
+build/
+
+# ─── Entorno virtual ──────────────────────────────────────
+venv/
+env/
+.venv/
+ENV/
+
+# ─── Variables de entorno ─────────────────────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ─── Base de datos SQLite ─────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── Node / React / Vite ──────────────────────────────────
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Testing ──────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ─── IDEs ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*~
+
+# ─── Sistema operativo ────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs y temporales ────────────────────────────────────
+*.log
+*.tmp
+*.bak
+logs/
+
+# ─── Exportaciones CSV del scraping ───────────────────────
+data/exports/
+*.csv
+*.xlsx
+
+# Variables sensibles
+.env
+
+# Dependencias React
+frontend/node_modules/
+
+# Base de datos SQLite
+backend/data/
+
+# Cache Python
+__pycache__/
+*.pyc
