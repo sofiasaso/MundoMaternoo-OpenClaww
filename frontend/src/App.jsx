@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 
+import igMM from "./assets/igMM.png";
+import fkMM from "./assets/fkMM.png";
+import wpMM from "./assets/wpMM.png";
+import correoMM from "./assets/correoMM.png";
+
 /* ── Constantes ─────────────────────────────────────────── */
 const API = "http://127.0.0.1:8000";
 const COMPETITORS = ["carymar", "saraisa", "ohmama"];
@@ -466,6 +471,103 @@ export default function App() {
           <ProductTable products={products} loading={loadP} error={errorP} />
           <AlertsPanel  alerts={alerts}     loading={loadA} />
         </div>
+
+        <footer className="footer">
+
+  <div className="footer-left">
+    <img
+      src="/images/Logo.png"
+      alt="Mundo Materno"
+      className="footer-logo"
+    />
+
+    <div>
+      <p className="footer-brand">
+        MundoMaterno
+      </p>
+
+      <p className="footer-copy">
+        © 2026 Mundo Materno · Todos los derechos reservados
+      </p>
+
+      <p className="footer-academic">
+        Proyecto académico desarrollado para la materia
+        Tecnologías Disruptivas.
+        <p></p>
+        Las 3L y David.
+      </p>
+    </div>
+  </div>
+
+  <div className="footer-right">
+
+    <p className="footer-social-title">
+      Redes sociales
+    </p>
+
+    <div className="footer-socials">
+
+      {/* Instagram */}
+      <a
+        href="https://www.instagram.com/mundo_materno__?utm_source=qr&igsh=cnBtdXVyNXJxejcx"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="social-icon-btn"
+      >
+        <img
+          src={igMM}
+          alt="Instagram Mundo Materno"
+          className="social-icon"
+        />
+      </a>
+
+      {/* Correo */}
+      <a
+        href="mailto:mundomaternoco@gmail.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="social-icon-btn"
+      >
+        <img
+          src={correoMM}
+          alt="Mail Mundo Materno"
+          className="social-icon"
+        />
+      </a>
+
+      {/* Facebook */}
+      <a
+        href="https://www.facebook.com/share/1dFyBUH7wJ/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="social-icon-btn"
+      >
+        <img
+          src={fkMM}
+          alt="Facebook Mundo Materno"
+          className="social-icon"
+        />
+      </a>
+
+      {/* WhatsApp */}
+      <a
+        href="https://wa.me/573144252939"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="social-icon-btn"
+      >
+        <img
+          src={wpMM}
+          alt="WhatsApp Mundo Materno"
+          className="social-icon"
+        />
+      </a>
+
+    </div>
+
+  </div>
+
+</footer>
 
       </main>
 

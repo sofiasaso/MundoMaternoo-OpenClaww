@@ -570,3 +570,140 @@ tbody tr:hover {
     opacity: .5;
   }
 }
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+  margin-top: 3rem;
+
+  background: white;
+  border-top: 1px solid var(--border);
+
+  padding: 2rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.footer-logo {
+  width: 90px;
+  object-fit: contain;
+}
+
+.footer-brand {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: .3rem;
+}
+
+.footer-copy {
+  color: var(--text-muted);
+  font-size: .9rem;
+  margin-bottom: .3rem;
+}
+
+.footer-academic {
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .7rem;
+}
+
+.footer-social-title {
+  font-weight: 700;
+}
+
+.footer-socials {
+  display: flex;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.social-icon-btn {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: white;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  transition: .2s ease;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.social-icon-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.social-icon {
+  width: 28px;
+  height: 28px;
+
+  object-fit: contain;
+}
+
+.social-btn {
+  text-decoration: none;
+
+  background: var(--agua-pale);
+  color: var(--agua-dark);
+
+  padding: .65rem 1rem;
+  border-radius: 999px;
+
+  font-size: .9rem;
+  font-weight: 600;
+
+  transition: .2s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  background: var(--agua-light);
+}
+
+.social-disabled {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* =========================================================
+   RESPONSIVE FOOTER
+========================================================= */
+
+@media(max-width: 850px) {
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-right {
+    align-items: flex-start;
+  }
+
+}
