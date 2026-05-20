@@ -1,4 +1,4 @@
-# MundoMaterno-OpenClaw
+# MundoMaterno
 
 > Sistema de Inteligencia Competitiva para el sector de ropa materna — monitoreo automatizado de competidores, almacenamiento histórico de precios y visualización ejecutiva de métricas.
 
