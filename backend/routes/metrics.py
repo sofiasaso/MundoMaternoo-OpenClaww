@@ -1,21 +1,21 @@
 # ==============================================================================
 # ARCHIVO 7: /backend/routes/metrics.py
 # TIPO: Router / Controlador API (Python)
-# FUNCIÓN:
-#   Calcula métricas ejecutivas para el dashboard competitivo
-#   de Mundo Materno.
+# FUNCIÓN: Calcula y expone métricas ejecutivas en tiempo real sobre los
+#          datos de precios y productos de Carymar, Saraisa y OhMama.
+#          Alimenta las gráficas Chart.js del dashboard de Mundo Materno.
 #
-# NUEVA LÓGICA:
-#   - Elimina Saraisa automáticamente
-#   - Ranking de competidores (más barato → más caro)
-#   - Comparación por categorías
-#   - Variación histórica más importante
-#   - KPIs más útiles para el dashboard final
+# ENDPOINT:
+#   GET /metrics/   → Resumen ejecutivo con totales, promedios y rankings
+#
+# CÓMO PROBAR:
+#   Primero ejecutar un scraping (POST /scraping/run-scraping)
+#   Luego consultar GET /metrics/ para ver los datos calculados
 # ==============================================================================
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func
 
 from database.connection import get_db
 from models.product import Product
@@ -26,45 +26,24 @@ router = APIRouter()
 
 @router.get("/", summary="Métricas ejecutivas del mercado competidor")
 def get_metrics(db: Session = Depends(get_db)):
+    """
+    Devuelve un resumen ejecutivo con:
+    - Total de productos monitoreados
+    - Promedio de precios global y por competidor
+    - Competidor con precio promedio más bajo
+    - Total de cambios de precio detectados
+    - Desglose por categoría
+    """
 
-    # ==========================================================================
-    # FILTRAR SOLO COMPETIDORES REALES
-    # ==========================================================================
+    # ─── Totales generales ────────────────────────────────────
+    total_productos = db.query(func.count(Product.id)).scalar() or 0
+    total_cambios   = db.query(func.count(PriceHistory.id)).scalar() or 0
 
-    competidores_validos = ["carymar", "ohmama"]
-
-    # ==========================================================================
-    # TOTAL PRODUCTOS
-    # ==========================================================================
-
-    total_productos = (
-        db.query(func.count(Product.id))
-        .filter(Product.competitor.in_(competidores_validos))
-        .scalar()
-    ) or 0
-
-    # ==========================================================================
-    # TOTAL CAMBIOS HISTÓRICOS
-    # ==========================================================================
-
-    total_cambios = db.query(func.count(PriceHistory.id)).scalar() or 0
-
-    # ==========================================================================
-    # PROMEDIO GLOBAL
-    # ==========================================================================
-
-    avg_global = (
-        db.query(func.avg(Product.price))
-        .filter(Product.competitor.in_(competidores_validos))
-        .scalar()
-    )
-
+    # ─── Promedio global de precios ───────────────────────────
+    avg_global = db.query(func.avg(Product.price)).scalar()
     avg_global = round(avg_global, 2) if avg_global else 0.0
 
-    # ==========================================================================
-    # RESUMEN POR COMPETIDOR
-    # ==========================================================================
-
+    # ─── Resumen por competidor ───────────────────────────────
     por_competidor = (
         db.query(
             Product.competitor,
@@ -73,131 +52,102 @@ def get_metrics(db: Session = Depends(get_db)):
             func.min(Product.price).label("minimo"),
             func.max(Product.price).label("maximo"),
         )
-        .filter(Product.competitor.in_(competidores_validos))
         .group_by(Product.competitor)
-        .order_by(func.avg(Product.price).asc())
         .all()
     )
 
-    competidores = []
+    competidores = [
+        {
+            "competitor":         row.competitor,
+            "total_productos":    row.total,
+            "precio_promedio":    round(row.promedio, 2),
+            "precio_minimo":      round(row.minimo, 2),
+            "precio_maximo":      round(row.maximo, 2),
+        }
+        for row in por_competidor
+    ]
 
-    for row in por_competidor:
-        competidores.append({
-            "competitor": row.competitor,
+    # ─── Competidor más barato ────────────────────────────────
+    mas_barato = (
+        min(competidores, key=lambda x: x["precio_promedio"])
+        if competidores else None
+    )
+
+    # ─── Resumen por categoría ────────────────────────────────
+    por_categoria = (
+        db.query(
+            Product.category,
+            func.count(Product.id).label("total"),
+            func.avg(Product.price).label("promedio"),
+        )
+        .group_by(Product.category)
+        .order_by(func.avg(Product.price).desc())
+        .all()
+    )
+
+    categorias = [
+        {
+            "category":        row.category,
             "total_productos": row.total,
             "precio_promedio": round(row.promedio, 2),
-            "precio_minimo": round(row.minimo, 2),
-            "precio_maximo": round(row.maximo, 2),
-        })
+        }
+        for row in por_categoria
+    ]
 
-    # ==========================================================================
-    # TOP COMPETIDOR MÁS BARATO
-    # ==========================================================================
-
-    mas_barato = competidores[0] if competidores else None
-
-    # ==========================================================================
-    # RANKING COMPLETO
-    # ==========================================================================
-
-    ranking_competidores = competidores
-
-    # ==========================================================================
-    # COMPARACIÓN POR CATEGORÍA
-    # ==========================================================================
-
-    categorias_raw = (
+    comparativa_categorias = (
         db.query(
             Product.category,
             Product.competitor,
-            func.avg(Product.price).label("promedio"),
-            func.count(Product.id).label("total")
+            func.avg(Product.price).label("promedio")
         )
-        .filter(Product.competitor.in_(competidores_validos))
+        .filter(Product.category.isnot(None))
         .group_by(Product.category, Product.competitor)
         .all()
     )
 
-    categorias_map = {}
+    comparativas = {}
 
-    for row in categorias_raw:
+    for row in comparativa_categorias:
+        categoria = row.category
 
-        categoria = row.category or "Sin categoría"
+        if categoria not in comparativas:
+            comparativas[categoria] = []
 
-        if categoria not in categorias_map:
-            categorias_map[categoria] = []
-
-        categorias_map[categoria].append({
+        comparativas[categoria].append({
             "competitor": row.competitor,
-            "precio_promedio": round(row.promedio, 2),
-            "total_productos": row.total
+            "precio_promedio": round(row.promedio, 2)
         })
 
-    comparativa_categorias = []
-
-    for categoria, data in categorias_map.items():
-
-        ordenados = sorted(
-            data,
-            key=lambda x: x["precio_promedio"]
+    ultimos_cambios = (
+        db.query(
+            PriceHistory.product_name,
+            PriceHistory.competitor,
+            PriceHistory.old_price,
+            PriceHistory.new_price,
+            PriceHistory.change_percentage
         )
-
-        mas_economico = ordenados[0]
-
-        comparativa_categorias.append({
-            "category": categoria,
-            "mas_barato": mas_economico["competitor"],
-            "precio_promedio": mas_economico["precio_promedio"],
-            "competidores": ordenados
-        })
-
-    # ==========================================================================
-    # MAYOR CAMBIO HISTÓRICO
-    # ==========================================================================
-
-    mayor_cambio = (
-        db.query(PriceHistory)
-        .order_by(desc(PriceHistory.change_percentage))
-        .first()
+        .order_by(PriceHistory.created_at.desc())
+        .limit(5)
+        .all()
     )
 
-    variacion_historica = None
-
-    if mayor_cambio:
-
-        producto = (
-            db.query(Product)
-            .filter(Product.id == mayor_cambio.product_id)
-            .first()
-        )
-
-        variacion_historica = {
-            "producto": producto.name if producto else "Producto desconocido",
-            "competidor": producto.competitor if producto else "Desconocido",
-            "porcentaje": round(mayor_cambio.change_percentage, 2),
-            "precio_anterior": mayor_cambio.old_price,
-            "precio_nuevo": mayor_cambio.new_price,
-        }
-
-    # ==========================================================================
-    # RESPUESTA FINAL
-    # ==========================================================================
-
     return {
-
         "resumen_general": {
-            "total_productos": total_productos,
+            "total_productos":          total_productos,
             "total_cambios_detectados": total_cambios,
-            "precio_promedio_global": avg_global,
+            "precio_promedio_global":   avg_global,
         },
-
         "competidor_mas_barato": mas_barato,
-
-        "ranking_competidores": ranking_competidores,
-
-        "comparativa_categorias": comparativa_categorias,
-
-        "variacion_historica_destacada": variacion_historica,
-
-        "por_competidor": competidores,
+        "por_competidor":        competidores,
+        "comparativas_por_categoria": comparativas,
+        "ultimas_variaciones": [
+            {
+                "producto": row.product_name,
+                "competidor": row.competitor,
+                "precio_anterior": row.old_price,
+                "precio_nuevo": row.new_price,
+                "variacion": row.change_percentage,
+            }
+            for row in ultimos_cambios
+        ],
     }
