@@ -408,7 +408,14 @@ export default function App() {
           <KpiCard
             label="Productos monitoreados"
             value={resumen?.total_productos}
-            sub={porComp.length ? `En ${porComp.length} tiendas` : "Sin datos aún"}
+            sub={
+              porComp.length
+                ? porComp
+                    .map(c => `${capitalize(c.competitor)}: ${c.total_productos}`)
+                    .join(" · ")
+                : "Sin datos aún"
+            }
+            //sub={porComp.length ? `En ${porComp.length} tiendas` : "Sin datos aún"}
             barColor="var(--agua)"
             loading={loadM}
           />
