@@ -253,6 +253,7 @@ export default function App() {
   const [alerts,     setAlerts]     = useState([]);
   const [status,     setStatus]     = useState(null);
   const [competitor, setCompetitor] = useState("");        // filtro activo
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loadM,      setLoadM]      = useState(true);
   const [loadP,      setLoadP]      = useState(true);
   const [loadA,      setLoadA]      = useState(true);
@@ -331,6 +332,12 @@ export default function App() {
   const resumen  = metrics?.resumen_general;
   const masBar   = metrics?.competidor_mas_barato;
   const porComp  = metrics?.por_competidor ?? [];
+  const comparativas = metrics?.comparativas_por_categoria ?? {};
+  const categoriasDisponibles = Object.keys(comparativas);
+
+  const categoriaActiva = selectedCategory
+    ? comparativas[selectedCategory] ?? []
+    : [];
 
   const lastScrape = status?.ultimo_scraping
     ? new Date(status.ultimo_scraping).toLocaleString("es-CO", {
@@ -441,6 +448,68 @@ export default function App() {
             loading={loadM}
           />
         </div>
+
+
+        <div className="category-panel panel">
+          <div className="panel-head">
+            <div>
+              <p className="panel-title">
+                Comparativa por categoría
+              </p>
+
+              <p className="panel-count">
+                Analiza quién vende más barato por tipo de prenda
+              </p>
+            </div>
+
+            <select
+              className="category-select"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">
+                Selecciona categoría
+              </option>
+
+              {categoriasDisponibles.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {categoriaActiva.length > 0 && (
+            <div className="category-ranking">
+
+              {[...categoriaActiva]
+                .sort((a,b) => a.precio_promedio - b.precio_promedio)
+                .map((c, i) => (
+                  <div key={i} className="category-card">
+
+                    <p className="category-rank">
+                      #{i + 1}
+                    </p>
+
+                    <p className="category-name">
+                      {capitalize(c.competitor)}
+                    </p>
+
+                    <p className="category-price">
+                      {cop(c.precio_promedio)}
+                    </p>
+
+                  </div>
+                ))}
+
+            </div>
+          )}
+
+        </div>
+
+
+
+
 
         {/* Chips por tienda */}
         {!loadM && porComp.length > 0 && (
