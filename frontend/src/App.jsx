@@ -8,7 +8,7 @@ import correoMM from "./assets/correoMM.png";
 
 /* ── Constantes ─────────────────────────────────────────── */
 const API = "http://127.0.0.1:8000";
-const COMPETITORS = ["carymar", "saraisa", "ohmama"];
+const COMPETITORS = ["carymar", "ohmama"];
 
 /* ── Utilidades ─────────────────────────────────────────── */
 const cop = (n) =>
@@ -259,6 +259,7 @@ export default function App() {
   const [errorP,     setErrorP]     = useState(null);
   const [scraping,   setScraping]   = useState(false);
   const [toast,      setToast]      = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   /* ── Helpers de fetch ── */
   const fetchMetrics = useCallback(async () => {
@@ -328,9 +329,12 @@ export default function App() {
   };
 
   /* ── Datos derivados ── */
-  const resumen  = metrics?.resumen_general;
-  const masBar   = metrics?.competidor_mas_barato;
-  const porComp  = metrics?.por_competidor ?? [];
+  const resumen         = metrics?.resumen_general;
+  const ranking         = metrics?.ranking_competidores ?? [];
+  const categorias      = metrics?.categorias_disponibles ?? [];
+  const comparativa     = metrics?.comparativa_categoria ?? [];
+  const variaciones     = metrics?.ultimas_variaciones ?? [];
+  const porComp         = metrics?.por_competidor ?? [];
 
   const lastScrape = status?.ultimo_scraping
     ? new Date(status.ultimo_scraping).toLocaleString("es-CO", {
@@ -408,32 +412,100 @@ export default function App() {
           <KpiCard
             label="Productos monitoreados"
             value={resumen?.total_productos}
-            sub={porComp.length ? `En ${porComp.length} tiendas` : "Sin datos aún"}
+            sub={
+              porComp.length
+                ? porComp
+                    .map((c) => `${capitalize(c.competitor)}: ${c.total_productos}`)
+                    .join(" · ")
+                : "Sin datos"
+            }
             barColor="var(--agua)"
             loading={loadM}
           />
           <KpiCard
-            label="Precio promedio global"
-            value={cop(resumen?.precio_promedio_global)}
-            sub="Sobre todos los productos"
-            barColor="var(--agua-dark)"
-            loading={loadM}
-          />
-          <KpiCard
-            label="Tienda más económica"
+            label="TRanking competitivo"
             value={masBar ? capitalize(masBar.competitor) : "—"}
             sub={masBar ? `Prom. ${cop(masBar.precio_promedio)}` : "Ejecuta un scraping"}
             barColor="var(--agua)"
             loading={loadM}
           />
-          <KpiCard
-            label="Cambios de precio"
-            value={resumen?.total_cambios_detectados}
-            sub="Variaciones históricas detectadas"
-            barColor="var(--fucsia)"
-            loading={loadM}
-          />
+          <div className="variation-card">
+            <h3>Últimas variaciones detectadas</h3>
+
+            {variaciones.map((v, i) => (
+              <div className="variation-item" key={i}>
+
+                <div>
+                  <p className="variation-product">
+                    {v.product_name}
+                  </p>
+
+                  <p className="variation-provider">
+                    {capitalize(v.competitor)}
+                  </p>
+                </div>
+
+                <span className="variation-badge">
+                  ↓ {v.reduction_pct}%
+                </span>
+
+              </div>
+            ))}
+
+          </div>
+           
+
         </div>
+
+        <div className="category-panel">
+
+          <div className="category-header">
+            <h2>Comparativa por categoría</h2>
+
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="category-select"
+            >
+              <option value="">Selecciona categoría</option>
+
+              {categorias.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedCategory && (
+            <div className="category-ranking">
+              {comparativa
+                .filter((c) => c.category === selectedCategory)
+                .sort((a, b) => a.average_price - b.average_price)
+                .map((item, index) => (
+                  <div className="category-card" key={item.competitor}>
+
+                    <div className="category-top">
+                      <span className="category-position">
+                        #{index + 1}
+                      </span>
+
+                      <span className="category-competitor">
+                        {capitalize(item.competitor)}
+                      </span>
+                    </div>
+
+                    <p className="category-price">
+                      {cop(item.average_price)}
+                    </p>
+
+                  </div>
+                ))}
+            </div>
+          )}
+
+        </div>
+
 
         {/* Chips por tienda */}
         {!loadM && porComp.length > 0 && (
