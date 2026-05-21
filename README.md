@@ -1,4 +1,4 @@
-# MundoMaterno-OpenClaw
+# MundoMaterno
 
 > Sistema de Inteligencia Competitiva para el sector de ropa materna — monitoreo automatizado de competidores, almacenamiento histórico de precios y visualización ejecutiva de métricas.
 
@@ -78,7 +78,7 @@ El sistema actúa como un agente central coordinado por OpenClaw, capaz de gesti
 ## Estructura de carpetas
 
 ```
-MundoMaterno-OpenClaw/
+MundoMaterno/
 │
 ├── backend/                  # API REST y lógica del servidor
 │   ├── main.py               # Punto de entrada FastAPI
@@ -132,8 +132,8 @@ MundoMaterno-OpenClaw/
 **1. Clonar el repositorio**
 
 ```bash
-git clone https://github.com/sofiasaso/MundoMaterno-OpenClaw.git
-cd MundoMaterno-OpenClaw
+git clone https://github.com/sofiasaso/MundoMaternoo-OpenClaww.git
+cd MundoMaternoo-OpenClaww
 ```
 
 **2. Crear entorno virtual e instalar dependencias del backend**
