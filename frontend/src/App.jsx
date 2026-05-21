@@ -440,6 +440,22 @@ export default function App() {
             barColor="var(--agua)"
             loading={loadM}
           />
+          <div className="ranking-list">
+            {[...porComp]
+              .sort((a,b) => a.precio_promedio - b.precio_promedio)
+              .map((c, i) => (
+                <div key={i} className="ranking-item">
+                  <span>
+                    #{i + 1} {capitalize(c.competitor)}
+                  </span>
+
+                  <strong>
+                    {cop(c.precio_promedio)}
+                  </strong>
+                </div>
+              ))}
+          </div>
+
           <KpiCard
             label="Cambios de precio"
             value={resumen?.total_cambios_detectados}
