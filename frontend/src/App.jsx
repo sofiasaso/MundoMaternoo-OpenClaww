@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 
-import igMM from "./assets/igMM.png";
-import fkMM from "./assets/fkMM.png";
-import wpMM from "./assets/wpMM.png";
-import correoMM from "./assets/correoMM.png";
+import igMM      from "./assets/igMM.png";
+import fkMM      from "./assets/fkMM.png";
+import wpMM      from "./assets/wpMM.png";
+import correoMM  from "./assets/correoMM.png";
 
 /* ── Constantes ─────────────────────────────────────────── */
-const API = "http://127.0.0.1:8000";
+const API         = "http://127.0.0.1:8000";
 const COMPETITORS = ["carymar", "saraisa", "ohmama"];
 
 /* ── Utilidades ─────────────────────────────────────────── */
@@ -19,19 +19,17 @@ const cop = (n) =>
 const fdate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString("es-CO", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
+        day: "2-digit", month: "short", year: "numeric",
       })
     : "—";
 
 const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "");
 
 /* ================================================================
-   COMPONENTES INTERNOS
+   COMPONENTES
 ================================================================ */
 
-/* ── KPI Card ──────────────────────────────────────────────── */
+/* ── KPI Card genérica ────────────────────────────────────── */
 function KpiCard({ label, value, sub, barColor, loading }) {
   return (
     <div className="kpi-card">
@@ -49,7 +47,79 @@ function KpiCard({ label, value, sub, barColor, loading }) {
   );
 }
 
-/* ── Panel de alertas ──────────────────────────────────────── */
+/* ── SOLICITUD 1: Panel de variaciones históricas ─────────── */
+/*
+   Reemplaza la antigua KpiCard de "Cambios de precio".
+   Muestra el conteo total + lista scrollable con:
+     - Proveedor (badge coloreado)
+     - Nombre de la prenda (truncado)
+     - Precio anterior → precio nuevo
+     - Porcentaje de cambio (+/-) coloreado
+*/
+function VariacionesCard({ total, variaciones, loading }) {
+  return (
+    <div className="variaciones-card">
+      <div className="kpi-bar" style={{ background: "var(--fucsia)" }} />
+      <p className="kpi-label">Variaciones históricas</p>
+
+      {loading ? (
+        <div className="kpi-skeleton" />
+      ) : (
+        <p className="kpi-value" style={{ color: "var(--fucsia)" }}>
+          {total ?? "—"}
+        </p>
+      )}
+
+      {!loading && variaciones.length > 0 && (
+        <>
+          <p className="kpi-sub" style={{ marginBottom: ".5rem" }}>
+            Últimas {variaciones.length} detectadas
+          </p>
+          <div className="variaciones-list">
+            {variaciones.map((v, i) => {
+              const subio = v.diff > 0;
+              return (
+                <div key={i} className="variacion-item">
+                  <div className="variacion-top">
+                    <span className={`badge badge-${v.competitor}`}>
+                      {v.competitor}
+                    </span>
+                    <span
+                      className="variacion-pct"
+                      style={{ color: subio ? "var(--fucsia)" : "var(--agua-dark)" }}
+                    >
+                      {subio ? "+" : ""}{v.diff_pct}%
+                    </span>
+                  </div>
+                  <p className="variacion-name" title={v.product_name}>
+                    {v.product_name}
+                  </p>
+                  <div className="variacion-prices">
+                    <span className="variacion-old">{cop(v.old_price)}</span>
+                    <span className="variacion-arrow">→</span>
+                    <span
+                      className="variacion-new"
+                      style={{ color: subio ? "var(--fucsia)" : "var(--agua-dark)" }}
+                    >
+                      {cop(v.new_price)}
+                    </span>
+                    <span className="variacion-date">{fdate(v.detected_at)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {!loading && variaciones.length === 0 && (
+        <p className="kpi-sub">Ejecuta un scraping para registrar cambios.</p>
+      )}
+    </div>
+  );
+}
+
+/* ── Panel de alertas ─────────────────────────────────────── */
 function AlertsPanel({ alerts, loading }) {
   return (
     <div className="panel">
@@ -111,8 +181,8 @@ function AlertsPanel({ alerts, loading }) {
 /* ── Tabla de productos ────────────────────────────────────── */
 function ProductTable({ products, loading, error }) {
   const [search, setSearch] = useState("");
-  const [sortF, setSortF] = useState("scraped_at");
-  const [sortD, setSortD] = useState("desc");
+  const [sortF, setSortF]   = useState("scraped_at");
+  const [sortD, setSortD]   = useState("desc");
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -122,8 +192,7 @@ function ProductTable({ products, loading, error }) {
         (p.category ?? "").toLowerCase().includes(q)
     );
     list = [...list].sort((a, b) => {
-      let va = a[sortF] ?? "",
-        vb = b[sortF] ?? "";
+      let va = a[sortF] ?? "", vb = b[sortF] ?? "";
       if (typeof va === "string") va = va.toLowerCase();
       if (typeof vb === "string") vb = vb.toLowerCase();
       if (va < vb) return sortD === "asc" ? -1 : 1;
@@ -172,13 +241,11 @@ function ProductTable({ products, loading, error }) {
           <span className="state-icon">⟳</span>Cargando productos…
         </div>
       )}
-
       {!loading && error && (
         <div className="state" style={{ color: "var(--fucsia)" }}>
           <span className="state-icon">✕</span>{error}
         </div>
       )}
-
       {!loading && !error && filtered.length === 0 && (
         <div className="state">
           <span className="state-icon">◎</span>
@@ -229,9 +296,7 @@ function ProductTable({ products, loading, error }) {
                       >
                         ↗
                       </a>
-                    ) : (
-                      "—"
-                    )}
+                    ) : "—"}
                   </td>
                 </tr>
               ))}
@@ -247,21 +312,20 @@ function ProductTable({ products, loading, error }) {
    APP PRINCIPAL
 ================================================================ */
 export default function App() {
-  /* ── Estado ── */
-  const [metrics,    setMetrics]    = useState(null);
-  const [products,   setProducts]   = useState([]);
-  const [alerts,     setAlerts]     = useState([]);
-  const [status,     setStatus]     = useState(null);
-  const [competitor, setCompetitor] = useState("");        // filtro activo
+  const [metrics,          setMetrics]          = useState(null);
+  const [products,         setProducts]         = useState([]);
+  const [alerts,           setAlerts]           = useState([]);
+  const [status,           setStatus]           = useState(null);
+  const [competitor,       setCompetitor]       = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [loadM,      setLoadM]      = useState(true);
-  const [loadP,      setLoadP]      = useState(true);
-  const [loadA,      setLoadA]      = useState(true);
-  const [errorP,     setErrorP]     = useState(null);
-  const [scraping,   setScraping]   = useState(false);
-  const [toast,      setToast]      = useState(null);
+  const [loadM,            setLoadM]            = useState(true);
+  const [loadP,            setLoadP]            = useState(true);
+  const [loadA,            setLoadA]            = useState(true);
+  const [errorP,           setErrorP]           = useState(null);
+  const [scraping,         setScraping]         = useState(false);
+  const [toast,            setToast]            = useState(null);
 
-  /* ── Helpers de fetch ── */
+  /* ── Fetch ── */
   const fetchMetrics = useCallback(async () => {
     setLoadM(true);
     try {
@@ -297,17 +361,14 @@ export default function App() {
     finally { setLoadA(false); }
   }, []);
 
-  /* ── Carga inicial ── */
   useEffect(() => {
     fetchMetrics();
     fetchProducts("");
     fetchAlerts();
   }, [fetchMetrics, fetchProducts, fetchAlerts]);
 
-  /* ── Cambio de filtro de competidor ── */
   useEffect(() => { fetchProducts(competitor); }, [competitor, fetchProducts]);
 
-  /* ── Ejecutar scraping ── */
   const handleScraping = async () => {
     setScraping(true);
     try {
@@ -329,16 +390,21 @@ export default function App() {
   };
 
   /* ── Datos derivados ── */
-  const resumen  = metrics?.resumen_general;
-  const masBar   = metrics?.competidor_mas_barato;
-  const porComp  = metrics?.por_competidor ?? [];
-  const variaciones = metrics?.ultimas_variaciones ?? [];
+  const resumen      = metrics?.resumen_general;
+  const masBar       = metrics?.competidor_mas_barato;
+  const porComp      = metrics?.por_competidor ?? [];
+  const variaciones  = metrics?.ultimas_variaciones ?? [];           // ← Solicitud 1
   const comparativas = metrics?.comparativas_por_categoria ?? {};
   const categoriasDisponibles = Object.keys(comparativas);
 
   const categoriaActiva = selectedCategory
     ? comparativas[selectedCategory] ?? []
     : [];
+
+  // SOLICITUD 3: precio promedio cambia según categoría seleccionada
+  const promCat = selectedCategory && categoriaActiva.length > 0
+    ? categoriaActiva.reduce((s, c) => s + c.precio_promedio, 0) / categoriaActiva.length
+    : null;
 
   const lastScrape = status?.ultimo_scraping
     ? new Date(status.ultimo_scraping).toLocaleString("es-CO", {
@@ -351,16 +417,13 @@ export default function App() {
   return (
     <div className="layout">
 
-      {/* ── Navbar ── */}
+      {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-brand">
           <span className="navbar-dot" />
-          <span className="navbar-logo">
-            Mundo<span>Materno</span>
-          </span>
+          <span className="navbar-logo">Mundo<span>Materno</span></span>
           <span className="navbar-chip">Inteligencia Competitiva</span>
         </div>
-
         <div className="navbar-right">
           {lastScrape && (
             <span className="navbar-status">Último scraping: {lastScrape}</span>
@@ -379,40 +442,29 @@ export default function App() {
         </div>
       </nav>
 
-      {/* ── Contenido ── */}
       <main className="main">
 
-
-        {/* Cabecera - ORIGINALLLLLL */}
-        {/*<div className="page-header">
-          <h1 className="page-title">Dashboard competitivo</h1>
-          <p className="page-sub">
-            Monitoreo de precios · Carymar, Saraisa y OhMama
-          </p>
-        </div>*/}
-
-          <div className="hero">
-            <div className="page-header">
-              <h1 className="page-title">Dashboard competitivo</h1>
-
-              <p className="page-sub">
-                Monitoreo de precios · Carymar, Saraisa y OhMama
-              </p>
-            </div>
-
-            <div className="hero-logo">
-              <img
-                src="/images/Logo.png"
-                alt="Logo Mundo Materno"
-                className="hero-logo-img"
-              />
-            </div>
-
+        {/* Hero */}
+        <div className="hero">
+          <div className="page-header">
+            <h1 className="page-title">Dashboard competitivo</h1>
+            <p className="page-sub">
+              Monitoreo de precios · Carymar, Saraisa y OhMama
+            </p>
           </div>
+          <div className="hero-logo">
+            <img
+              src="/images/Logo.png"
+              alt="Logo Mundo Materno"
+              className="hero-logo-img"
+            />
+          </div>
+        </div>
 
-
-        {/* KPIs */}
+        {/* ── KPIs ───────────────────────────────────────────── */}
         <div className="kpi-grid">
+
+          {/* KPI 1 — Productos monitoreados por marca */}
           <KpiCard
             label="Productos monitoreados"
             value={resumen?.total_productos}
@@ -423,132 +475,107 @@ export default function App() {
                     .join(" · ")
                 : "Sin datos aún"
             }
-            //sub={porComp.length ? `En ${porComp.length} tiendas` : "Sin datos aún"}
             barColor="var(--agua)"
             loading={loadM}
           />
+
+          {/*
+            KPI 2 — SOLICITUD 3:
+            Cuando no hay categoría seleccionada → promedio global.
+            Cuando hay categoría seleccionada → promedio de esa categoría.
+            El label también cambia para que sea claro qué se está viendo.
+          */}
           <KpiCard
-            label="Precio promedio global"
-            value={cop(resumen?.precio_promedio_global)}
-            sub="Sobre todos los productos"
+            label={
+              selectedCategory
+                ? `Precio promedio · ${selectedCategory}`
+                : "Precio promedio global"
+            }
+            value={cop(selectedCategory ? promCat : resumen?.precio_promedio_global)}
+            sub={
+              selectedCategory
+                ? `${categoriaActiva.length} competidor${categoriaActiva.length !== 1 ? "es" : ""} con datos`
+                : "Sobre todos los productos"
+            }
             barColor="var(--agua-dark)"
             loading={loadM}
           />
 
+          {/* KPI 3 — Ranking de tiendas */}
           <div className="ranking-card">
-            <div
-              className="kpi-bar"
-              style={{ background: "var(--agua)" }}
-            />
-
-            <p className="kpi-label">
-              Tienda más económica
-            </p>
-
-            <p
-              className="kpi-value"
-              style={{ color: "var(--agua)" }}
-            >
+            <div className="kpi-bar" style={{ background: "var(--agua)" }} />
+            <p className="kpi-label">Tienda más económica</p>
+            <p className="kpi-value" style={{ color: "var(--agua)" }}>
               {masBar ? capitalize(masBar.competitor) : "—"}
             </p>
-
             <p className="kpi-sub">
               {masBar
                 ? `Prom. ${cop(masBar.precio_promedio)}`
                 : "Ejecuta un scraping"}
             </p>
-
             <div className="ranking-list">
               {[...porComp]
-                .sort((a,b) => a.precio_promedio - b.precio_promedio)
+                .sort((a, b) => a.precio_promedio - b.precio_promedio)
                 .map((c, i) => (
                   <div key={i} className="ranking-item">
-
-                    <span>
-                      #{i + 1} {capitalize(c.competitor)}
-                    </span>
-
-                    <strong>
-                      {cop(c.precio_promedio)}
-                    </strong>
-
+                    <span>#{i + 1} {capitalize(c.competitor)}</span>
+                    <strong>{cop(c.precio_promedio)}</strong>
                   </div>
                 ))}
             </div>
           </div>
-          
-          <KpiCard
-            label="Cambios de precio"
-            value={resumen?.total_cambios_detectados}
-            sub="Variaciones históricas detectadas"
-            barColor="var(--fucsia)"
+
+          {/*
+            KPI 4 — SOLICITUD 1:
+            Reemplaza la simple tarjeta de número por VariacionesCard,
+            que muestra el total + lista con proveedor y prenda por cada
+            variación histórica detectada.
+          */}
+          <VariacionesCard
+            total={resumen?.total_cambios_detectados}
+            variaciones={variaciones}
             loading={loadM}
           />
+
         </div>
 
-
+        {/* ── Panel de comparativa por categoría ─────────────── */}
         <div className="category-panel panel">
           <div className="panel-head">
             <div>
-              <p className="panel-title">
-                Comparativa por categoría
-              </p>
-
+              <p className="panel-title">Comparativa por categoría</p>
               <p className="panel-count">
                 Analiza quién vende más barato por tipo de prenda
               </p>
             </div>
-
             <select
               className="category-select"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <option value="">
-                Selecciona categoría
-              </option>
-
+              <option value="">Selecciona categoría</option>
               {categoriasDisponibles.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
+                <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
           </div>
 
           {categoriaActiva.length > 0 && (
             <div className="category-ranking">
-
               {[...categoriaActiva]
-                .sort((a,b) => a.precio_promedio - b.precio_promedio)
+                .sort((a, b) => a.precio_promedio - b.precio_promedio)
                 .map((c, i) => (
                   <div key={i} className="category-card">
-
-                    <p className="category-rank">
-                      #{i + 1}
-                    </p>
-
-                    <p className="category-name">
-                      {capitalize(c.competitor)}
-                    </p>
-
-                    <p className="category-price">
-                      {cop(c.precio_promedio)}
-                    </p>
-
+                    <p className="category-rank">#{i + 1}</p>
+                    <p className="category-name">{capitalize(c.competitor)}</p>
+                    <p className="category-price">{cop(c.precio_promedio)}</p>
                   </div>
                 ))}
-
             </div>
           )}
-
         </div>
 
-
-
-
-
-        {/* Chips por tienda */}
+        {/* ── Chips por tienda ───────────────────────────────── */}
         {!loadM && porComp.length > 0 && (
           <div className="comp-row">
             {porComp.map((c) => (
@@ -561,7 +588,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Filtro por tienda + tabla + alertas */}
+        {/* ── Filtros de tienda ──────────────────────────────── */}
         <div style={{ marginBottom: ".75rem", display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
           <button
             className={`btn ${competitor === "" ? "btn-fucsia" : "btn-outline"}`}
@@ -580,107 +607,49 @@ export default function App() {
           ))}
         </div>
 
+        {/* ── Tabla + Alertas ───────────────────────────────── */}
         <div className="bottom-grid">
           <ProductTable products={products} loading={loadP} error={errorP} />
           <AlertsPanel  alerts={alerts}     loading={loadA} />
         </div>
 
+        {/* ── Footer ───────────────────────────────────────── */}
         <footer className="footer">
+          <div className="footer-left">
+            <img src="/images/Logo.png" alt="Mundo Materno" className="footer-logo" />
+            <div>
+              <p className="footer-brand">MundoMaterno</p>
+              <p className="footer-copy">© 2026 Mundo Materno · Todos los derechos reservados</p>
+              <p className="footer-academic">
+                Proyecto académico desarrollado para la materia Tecnologías Disruptivas.
+                <p></p>
+                Las 3L y David.
+              </p>
+            </div>
+          </div>
 
-  <div className="footer-left">
-    <img
-      src="/images/Logo.png"
-      alt="Mundo Materno"
-      className="footer-logo"
-    />
-
-    <div>
-      <p className="footer-brand">
-        MundoMaterno
-      </p>
-
-      <p className="footer-copy">
-        © 2026 Mundo Materno · Todos los derechos reservados
-      </p>
-
-      <p className="footer-academic">
-        Proyecto académico desarrollado para la materia
-        Tecnologías Disruptivas.
-        <p></p>
-        Las 3L y David.
-      </p>
-    </div>
-  </div>
-
-  <div className="footer-right">
-
-    <p className="footer-social-title">
-      Redes sociales
-    </p>
-
-    <div className="footer-socials">
-
-      {/* Instagram */}
-      <a
-        href="https://www.instagram.com/mundo_materno__?utm_source=qr&igsh=cnBtdXVyNXJxejcx"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-      >
-        <img
-          src={igMM}
-          alt="Instagram Mundo Materno"
-          className="social-icon"
-        />
-      </a>
-
-      {/* Correo */}
-      <a
-        href="mailto:mundomaternoco@gmail.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-      >
-        <img
-          src={correoMM}
-          alt="Mail Mundo Materno"
-          className="social-icon"
-        />
-      </a>
-
-      {/* Facebook */}
-      <a
-        href="https://www.facebook.com/share/1dFyBUH7wJ/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-      >
-        <img
-          src={fkMM}
-          alt="Facebook Mundo Materno"
-          className="social-icon"
-        />
-      </a>
-
-      {/* WhatsApp */}
-      <a
-        href="https://wa.me/573144252939"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-      >
-        <img
-          src={wpMM}
-          alt="WhatsApp Mundo Materno"
-          className="social-icon"
-        />
-      </a>
-
-    </div>
-
-  </div>
-
-</footer>
+          <div className="footer-right">
+            <p className="footer-social-title">Redes sociales</p>
+            <div className="footer-socials">
+              <a href="https://www.instagram.com/mundo_materno__?utm_source=qr&igsh=cnBtdXVyNXJxejcx"
+                target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                <img src={igMM} alt="Instagram Mundo Materno" className="social-icon" />
+              </a>
+              <a href="mailto:mundomaternoco@gmail.com"
+                target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                <img src={correoMM} alt="Mail Mundo Materno" className="social-icon" />
+              </a>
+              <a href="https://www.facebook.com/share/1dFyBUH7wJ/"
+                target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                <img src={fkMM} alt="Facebook Mundo Materno" className="social-icon" />
+              </a>
+              <a href="https://wa.me/573144252939"
+                target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                <img src={wpMM} alt="WhatsApp Mundo Materno" className="social-icon" />
+              </a>
+            </div>
+          </div>
+        </footer>
 
       </main>
 
