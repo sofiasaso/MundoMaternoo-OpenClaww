@@ -691,36 +691,6 @@ tbody tr:hover {
   pointer-events: none;
 }
 
-.ranking-list {
-  margin-top: 1rem;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: .5rem;
-}
-
-.ranking-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  background: var(--bg);
-
-  border-radius: 10px;
-  padding: .55rem .75rem;
-
-  font-size: .85rem;
-}
-
-.category-panel .panel-head {
-  align-items: center;
-}
-
-.category-select {
-  height: 44px;
-}
-
 /* =========================================================
    RESPONSIVE FOOTER
 ========================================================= */
