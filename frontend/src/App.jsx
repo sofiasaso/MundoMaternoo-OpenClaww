@@ -466,43 +466,6 @@ export default function App() {
           />
         </div>
 
-        <div className="panel variation-panel">
-          <div className="panel-head">
-            <div>
-              <p className="panel-title">
-                Variaciones históricas recientes
-              </p>
-
-              <p className="panel-count">
-                Últimos cambios detectados
-              </p>
-            </div>
-          </div>
-
-          <div className="variation-list">
-
-            {variaciones.map((v, i) => (
-              <div key={i} className="variation-item">
-
-                <p className="variation-product">
-                  {v.producto}
-                </p>
-
-                <p className="variation-provider">
-                  {capitalize(v.competidor)}
-                </p>
-
-                <p className="variation-prices">
-                  {cop(v.precio_anterior)} → {cop(v.precio_nuevo)}
-                </p>
-
-              </div>
-            ))}
-
-          </div>
-
-        </div>
-
 
         <div className="category-panel panel">
           <div className="panel-head">
