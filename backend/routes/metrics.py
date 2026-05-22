@@ -118,19 +118,6 @@ def get_metrics(db: Session = Depends(get_db)):
             "precio_promedio": round(row.promedio, 2)
         })
 
-    ultimos_cambios = (
-        db.query(
-            Product.name,
-            Product.competitor,
-            PriceHistory.old_price,
-            PriceHistory.new_price,
-            PriceHistory.change_percentage,
-        )
-        .join(Product, Product.id == PriceHistory.product_id)
-        .order_by(PriceHistory.created_at.desc())
-        .limit(5)
-        .all()
-    )
 
     return {
         "resumen_general": {
@@ -141,15 +128,4 @@ def get_metrics(db: Session = Depends(get_db)):
         "competidor_mas_barato": mas_barato,
         "por_competidor":        competidores,
         "comparativas_por_categoria": comparativas,
-
-        "ultimas_variaciones": [
-            {
-                "producto": row.name,
-                "competidor": row.competitor,
-                "precio_anterior": row.old_price,
-                "precio_nuevo": row.new_price,
-                "variacion": row.change_percentage,
-            }
-            for row in ultimos_cambios
-        ],
     }
