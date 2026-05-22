@@ -8,7 +8,7 @@ import correoMM from "./assets/correoMM.png";
 
 /* ── Constantes ─────────────────────────────────────────── */
 const API = "http://127.0.0.1:8000";
-const COMPETITORS = ["carymar", "saraisa", "ohmama"];
+const COMPETITORS = ["carymar", "ohmama"];
 
 /* ── Utilidades ─────────────────────────────────────────── */
 const cop = (n) =>
@@ -254,6 +254,7 @@ export default function App() {
   const [status,     setStatus]     = useState(null);
   const [competitor, setCompetitor] = useState("");        // filtro activo
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loadM,      setLoadM]      = useState(true);
   const [loadP,      setLoadP]      = useState(true);
   const [loadA,      setLoadA]      = useState(true);
@@ -331,7 +332,13 @@ export default function App() {
   /* ── Datos derivados ── */
   const resumen  = metrics?.resumen_general;
   const masBar   = metrics?.competidor_mas_barato;
-  const porComp  = metrics?.por_competidor ?? [];
+  const porComp = (metrics?.por_competidor ?? [])
+    .filter(c => c.competitor !== "saraisa");
+  const comparativas = metrics?.comparativas_por_categoria ?? {};
+  const categoriasDisponibles = Object.keys(comparativas);
+  const categoriaActiva = selectedCategory
+    ? comparativas[selectedCategory] ?? []
+    : [];
   const variaciones = metrics?.ultimas_variaciones ?? [];
   const comparativas = metrics?.comparativas_por_categoria ?? {};
   const categoriasDisponibles = Object.keys(comparativas);
@@ -434,13 +441,52 @@ export default function App() {
             barColor="var(--agua-dark)"
             loading={loadM}
           />
-          <KpiCard
-            label="Tienda más económica"
-            value={masBar ? capitalize(masBar.competitor) : "—"}
-            sub={masBar ? `Prom. ${cop(masBar.precio_promedio)}` : "Ejecuta un scraping"}
-            barColor="var(--agua)"
-            loading={loadM}
+          <div className="kpi-card">
+
+          <div
+            className="kpi-bar"
+            style={{ background: "var(--agua)" }}
           />
+
+          <p className="kpi-label">
+            Tienda más económica
+          </p>
+
+          <p
+            className="kpi-value"
+            style={{ color: "var(--agua)" }}
+          >
+            {masBar ? capitalize(masBar.competitor) : "—"}
+          </p>
+
+          <p className="kpi-sub">
+            {masBar
+              ? `Prom. ${cop(masBar.precio_promedio)}`
+              : "Ejecuta un scraping"}
+          </p>
+
+          <div className="ranking-list">
+
+            {[...porComp]
+              .sort((a,b) => a.precio_promedio - b.precio_promedio)
+              .map((c, i) => (
+                <div key={i} className="ranking-item">
+
+                  <span>
+                    #{i + 1} {capitalize(c.competitor)}
+                  </span>
+
+                  <strong>
+                    {cop(c.precio_promedio)}
+                  </strong>
+
+                </div>
+              ))}
+
+          </div>
+
+        </div>
+
           <div className="ranking-list">
             {[...porComp]
               .sort((a,b) => a.precio_promedio - b.precio_promedio)
@@ -468,6 +514,7 @@ export default function App() {
 
 
         <div className="category-panel panel">
+
           <div className="panel-head">
             <div>
               <p className="panel-title">
