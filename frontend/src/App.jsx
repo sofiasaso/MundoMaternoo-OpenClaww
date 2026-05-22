@@ -434,29 +434,49 @@ export default function App() {
             barColor="var(--agua-dark)"
             loading={loadM}
           />
-          <KpiCard
-            label="Tienda más económica"
-            value={masBar ? capitalize(masBar.competitor) : "—"}
-            sub={masBar ? `Prom. ${cop(masBar.precio_promedio)}` : "Ejecuta un scraping"}
-            barColor="var(--agua)"
-            loading={loadM}
-          />
-          <div className="ranking-list">
-            {[...porComp]
-              .sort((a,b) => a.precio_promedio - b.precio_promedio)
-              .map((c, i) => (
-                <div key={i} className="ranking-item">
-                  <span>
-                    #{i + 1} {capitalize(c.competitor)}
-                  </span>
 
-                  <strong>
-                    {cop(c.precio_promedio)}
-                  </strong>
-                </div>
-              ))}
+          <div className="ranking-card">
+            <div
+              className="kpi-bar"
+              style={{ background: "var(--agua)" }}
+            />
+
+            <p className="kpi-label">
+              Tienda más económica
+            </p>
+
+            <p
+              className="kpi-value"
+              style={{ color: "var(--agua)" }}
+            >
+              {masBar ? capitalize(masBar.competitor) : "—"}
+            </p>
+
+            <p className="kpi-sub">
+              {masBar
+                ? `Prom. ${cop(masBar.precio_promedio)}`
+                : "Ejecuta un scraping"}
+            </p>
+
+            <div className="ranking-list">
+              {[...porComp]
+                .sort((a,b) => a.precio_promedio - b.precio_promedio)
+                .map((c, i) => (
+                  <div key={i} className="ranking-item">
+
+                    <span>
+                      #{i + 1} {capitalize(c.competitor)}
+                    </span>
+
+                    <strong>
+                      {cop(c.precio_promedio)}
+                    </strong>
+
+                  </div>
+                ))}
+            </div>
           </div>
-
+          
           <KpiCard
             label="Cambios de precio"
             value={resumen?.total_cambios_detectados}

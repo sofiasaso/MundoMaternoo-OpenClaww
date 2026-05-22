@@ -265,6 +265,52 @@ body {
 }
 
 /* =========================================================
+   KPI RANKING CARD
+========================================================= */
+
+.ranking-card {
+  background: white;
+  border-radius: var(--r-lg);
+
+  padding: 1.3rem;
+
+  box-shadow: var(--shadow-sm);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  min-height: 100%;
+}
+
+.ranking-list {
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.ranking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: .7rem .85rem;
+
+  border-radius: 12px;
+
+  background: var(--agua-pale);
+
+  font-size: .92rem;
+}
+
+.ranking-item strong {
+  color: var(--agua-dark);
+  font-size: .95rem;
+}
+
+/* =========================================================
    CHIPS
 ========================================================= */
 
@@ -367,6 +413,36 @@ body {
 /* =========================================================
    INPUT
 ========================================================= */
+
+/* =========================================================
+   CATEGORY SELECT
+========================================================= */
+
+.category-select {
+  min-width: 240px;
+
+  padding: .85rem 1rem;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+
+  background: white;
+
+  font-size: .95rem;
+  font-family: var(--font);
+
+  color: var(--text);
+
+  outline: none;
+
+  transition: .2s ease;
+}
+
+.category-select:focus {
+  border-color: var(--agua);
+
+  box-shadow: 0 0 0 4px rgba(10,147,150,.12);
+}
 
 .search-input {
   width: 260px;
@@ -704,6 +780,16 @@ tbody tr:hover {
 
   .footer-right {
     align-items: flex-start;
+  }
+  
+    .panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .category-select {
+    width: 100%;
   }
 
 }
